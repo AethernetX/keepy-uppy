@@ -34,6 +34,7 @@ int main(int argc, char *argv[])
 {
     std::ifstream inf{ "Tasks.txt" };
     
+    // if the user has no task file
     if(!inf){
         int r = init();
         if(r != 0){
@@ -53,12 +54,16 @@ int main(int argc, char *argv[])
             return 0;
         }
 
+        // get the last time the command was used
         std::string str{};
         std::getline(inf, str);
 
         time_t x{atoll(str.c_str())};
+        std::time(&timer);
 
-        std::cout << "the current time is: " << std::asctime(std::localtime(&x));
+        std::cout << "the current time is: " << std::asctime(std::localtime(&timer));
+        std::cout << "the last time this command was used was: " << std::asctime(std::localtime(&x));
+        
         while(std::getline(inf, str)){
             std::cout << str << "\n";
         }
