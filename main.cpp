@@ -2,6 +2,7 @@
 #include <iostream>
 #include <string>
 
+#include <cstdint>
 #include <ctime>
 
 //representing tasks??
@@ -42,15 +43,22 @@ int main(int argc, char *argv[])
         return 0;
     }
 
-    //print tasks
-    if(argc == 1){
+    std::time_t timer;
 
-        if(inf.gcount() == 0){
+    //print tasks
+    if(argc < 2){
+
+        if(inf.gcount() == 1){
             std::cout << "You have no tasks yet!\ntype help for more information";
             return 0;
         }
 
         std::string str{};
+        std::getline(inf, str);
+
+        time_t x{atoll(str.c_str())};
+
+        std::cout << "the current time is: " << std::asctime(std::localtime(&x));
         while(std::getline(inf, str)){
             std::cout << str << "\n";
         }
@@ -61,6 +69,26 @@ int main(int argc, char *argv[])
 
         if(com1 == "help"){
             help();
+            return 0;
+        } else if(com1 == "add"){
+
+            std::time(&timer);
+
+            std::ofstream outf{ "Tasks.txt" };
+
+            // If we couldn't open the output file stream for writing
+            if (!outf)
+            {
+                std::cerr << "Unable to create file!\n";
+                return 1;
+            }
+
+            outf << timer;
+
+            //flushing for sanity sake
+            std::flush(outf);            
+            std::cout << timer;
+            std::cout << std::asctime(std::localtime(&timer));
             return 0;
         }
 
