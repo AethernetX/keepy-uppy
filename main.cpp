@@ -1,6 +1,7 @@
 #include <fstream>
 #include <iostream>
 #include <string>
+#include <vector>
 
 #include <cstdint>
 #include <ctime>
@@ -30,6 +31,70 @@ void help(){
     std::cout << " help: prints out the following\n add <enter string here>: adds a task(NOT WORKING)\n remove [index]: removes a task(NOT WORKING)\n";
 }
 
+int add(){
+    std::time_t timer{};
+    std::time(&timer);
+
+    std::ofstream outf{ "Tasks.txt" };
+
+    // If we couldn't open the output file stream for writing
+    if (!outf)
+    {
+        std::cerr << "Unable to create file!\n";
+        return 1;
+    }
+
+    outf << timer;
+    return 0;
+}
+
+int print(){
+
+    std::ifstream inf{};
+    
+    inf.open("Tasks.txt");
+
+    //the first string will always be the session time
+    std::string session{};
+    std::getline(inf, session);
+    
+    //convert entire file into vector
+    std::vector<std::string> tasks;
+    std::string str{};
+    while(std::getline(inf, str)){
+        tasks.push_back(str);
+    }
+
+    std::time_t prevTime;
+    prevTime = atoll(session.c_str());
+    
+    std::cout << "The last time this command was used was: " << std::asctime(std::localtime(&prevTime)) << "\n";
+
+    //the following will be the task name, followed by when it was last done
+    for(size_t i = 0; i < tasks.size(); i++){
+        std::cout << "[" << i << "] " << tasks[i] << "\n";
+    }
+
+    //close the file
+    
+
+    //now rewrite the file
+    std::ofstream outf{};
+
+    outf.open("Tasks.txt", std::ios::trunc);
+
+    std::time_t timer{};
+    std::time(&timer);
+
+    outf << timer << "\n";
+    
+    for(size_t i = 0; i < tasks.size(); i++){
+        outf << tasks[i] << "\n";
+    }
+    
+    return 0;
+}
+
 int main(int argc, char *argv[])
 {
     std::ifstream inf{ "Tasks.txt" };
@@ -44,8 +109,6 @@ int main(int argc, char *argv[])
         return 0;
     }
 
-    std::time_t timer;
-
     //print tasks
     if(argc < 2){
 
@@ -54,18 +117,9 @@ int main(int argc, char *argv[])
             return 0;
         }
 
-        // get the last time the command was used
-        std::string str{};
-        std::getline(inf, str);
-
-        time_t x{atoll(str.c_str())};
-        std::time(&timer);
-
-        std::cout << "the current time is: " << std::asctime(std::localtime(&timer));
-        std::cout << "the last time this command was used was: " << std::asctime(std::localtime(&x));
-        
-        while(std::getline(inf, str)){
-            std::cout << str << "\n";
+        int x = print();
+        if(x == 1){
+            return 1;
         }
         return 0;
     } else {
@@ -76,24 +130,10 @@ int main(int argc, char *argv[])
             help();
             return 0;
         } else if(com1 == "add"){
-
-            std::time(&timer);
-
-            std::ofstream outf{ "Tasks.txt" };
-
-            // If we couldn't open the output file stream for writing
-            if (!outf)
-            {
-                std::cerr << "Unable to create file!\n";
+            int x = add();
+            if(x == 1){
                 return 1;
             }
-
-            outf << timer;
-
-            //flushing for sanity sake
-            std::flush(outf);            
-            std::cout << timer;
-            std::cout << std::asctime(std::localtime(&timer));
             return 0;
         }
 
@@ -103,6 +143,15 @@ int main(int argc, char *argv[])
         //}
     }
 }
+
+/*
+TODO: 
+format tasks that haven't been handled for too long
+adding tasks
+removing tasks
+
+
+*/
 
 /*
 functions:
