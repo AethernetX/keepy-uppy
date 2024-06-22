@@ -6,12 +6,6 @@
 #include <cstdint>
 #include <ctime>
 
-//representing tasks??
-struct task {
-    std::string name;
-    std::time_t prevTime;
-};
-
 int init(){
     std::ofstream outf{ "Tasks.txt" };
 
@@ -22,8 +16,11 @@ int init(){
         return 1;
     }
 
-    //flushing for sanity sake
-    std::flush(outf);
+    std::time_t timer;
+    std::time(&timer);
+
+    outf << timer;
+
     return 0;
 }
 
@@ -31,7 +28,7 @@ void help(){
     std::cout << " help: prints out the following\n add <enter string here>: adds a task(NOT WORKING)\n remove [index]: removes a task(NOT WORKING)\n";
 }
 
-int add(){
+int add(std::string title){
     std::time_t timer{};
     std::time(&timer);
 
@@ -40,11 +37,14 @@ int add(){
     // If we couldn't open the output file stream for writing
     if (!outf)
     {
-        std::cerr << "Unable to create file!\n";
+        std::cerr << "Unable to write file!\n";
         return 1;
     }
 
+    outf << timer << "\n";
+    outf << title << "\n";
     outf << timer;
+
     return 0;
 }
 
@@ -52,6 +52,12 @@ int print(){
 
     std::ifstream inf{};
     
+    if (!inf)
+    {
+        std::cerr << "Unable to read file!\n";
+        return 1;
+    }
+
     inf.open("Tasks.txt");
 
     //the first string will always be the session time
@@ -72,7 +78,10 @@ int print(){
 
     //the following will be the task name, followed by when it was last done
     for(size_t i = 0; i < tasks.size(); i++){
-        std::cout << "[" << i << "] " << tasks[i] << "\n";
+        std::time_t taskTime;
+        std::cout << "[" << i << "] " << tasks[i] << " ";
+        taskTime = atoll(tasks[++i].c_str());
+        std::cout << std::asctime(std::localtime(&taskTime)) << "\n";
     }
 
     //close the file
@@ -80,6 +89,12 @@ int print(){
 
     //now rewrite the file
     std::ofstream outf{};
+
+    if (!outf)
+    {
+        std::cerr << "Unable to write file!\n";
+        return 1;
+    }
 
     outf.open("Tasks.txt", std::ios::trunc);
 
@@ -122,7 +137,7 @@ int main(int argc, char *argv[])
             return 1;
         }
         return 0;
-    } else {
+    } else if (argc == 3){
         //there's probably a more elegant solution than the following
         std::string com1 {argv[1]};
 
@@ -130,17 +145,15 @@ int main(int argc, char *argv[])
             help();
             return 0;
         } else if(com1 == "add"){
-            int x = add();
+            int x = add(argv[2]);
             if(x == 1){
                 return 1;
             }
             return 0;
         }
-
-        //std::cout << "Have " << argc << " arguments:\n";
-        //for (int i = 0; i < argc; ++i) {
-            //std::cout << argv[i] << "\n";
-        //}
+    } else {
+        std::cout << "ERROR: Unknown amount of arguments\n";
+        help();
     }
 }
 
@@ -149,7 +162,10 @@ TODO:
 format tasks that haven't been handled for too long
 adding tasks
 removing tasks
-
+refactor some of these kinda functions 
+int x = somefunc()
+if (x == 0)
+    return 0;
 
 */
 
