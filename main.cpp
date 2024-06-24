@@ -24,7 +24,7 @@ int init(){
 }
 
 void help(){
-    std::cout << " help: prints out the following\n add <enter string here>: adds a task\n remove [index]: removes a task(NOT WORKING)\n";
+    std::cout << " help: prints out the following\n add <enter string here>: adds a task\n remove: removes a task\n";
 }
 
 int add(std::string title){
