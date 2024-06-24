@@ -3,7 +3,6 @@
 #include <string>
 #include <vector>
 
-#include <cstdint>
 #include <ctime>
 
 int init(){
@@ -19,20 +18,20 @@ int init(){
     std::time_t timer;
     std::time(&timer);
 
-    outf << timer;
+    outf << timer << "\n";
 
     return 0;
 }
 
 void help(){
-    std::cout << " help: prints out the following\n add <enter string here>: adds a task(NOT WORKING)\n remove [index]: removes a task(NOT WORKING)\n";
+    std::cout << " help: prints out the following\n add <enter string here>: adds a task\n remove [index]: removes a task(NOT WORKING)\n";
 }
 
 int add(std::string title){
     std::time_t timer{};
     std::time(&timer);
 
-    std::ofstream outf{ "Tasks.txt" };
+    std::ofstream outf{};
 
     // If we couldn't open the output file stream for writing
     if (!outf)
@@ -41,9 +40,74 @@ int add(std::string title){
         return 1;
     }
 
-    outf << timer << "\n";
+    outf.open("Tasks.txt", std::ios::app);
     outf << title << "\n";
-    outf << timer;
+    outf << timer << "\n";
+    outf.close();
+
+    return 0;
+}
+
+int rem(){
+    std::ifstream inf{};
+    
+    if (!inf)
+    {
+        std::cerr << "Unable to read file!\n";
+        return 1;
+    }
+
+    inf.open("Tasks.txt");
+
+    //the first string will always be the session time
+    std::string session{};
+    std::getline(inf, session);
+    
+    //convert entire file into vector
+    std::vector<std::string> tasks;
+    std::string str{};
+    while(std::getline(inf, str)){
+        tasks.push_back(str);
+    }
+    
+    //the following will be the task name, followed by when it was last done
+    for(size_t i = 0; i < tasks.size(); i++){
+        std::time_t taskTime;
+        std::cout << "[" << i/2 << "] " << tasks[i] << " ";
+        taskTime = atoll(tasks[++i].c_str());
+        std::cout << std::asctime(std::localtime(&taskTime)) << "\n";
+    }
+
+    std::cout << "enter index of task you wish to remove: \n";
+    int v{};
+    std::cin >> v;
+
+    if (static_cast<long long unsigned int>(v*2) > tasks.size()){
+        std::cout << "invalid index\n";
+    } else {
+        std::cout << "removing " << tasks[v*2];
+        tasks.erase(tasks.begin() + ((v*2) - 1), tasks.begin() + ((v*2)) + 1);
+    }
+
+    //close the file
+    
+
+    //now rewrite the file
+    std::ofstream outf{};
+
+    if (!outf)
+    {
+        std::cerr << "Unable to write file!\n";
+        return 1;
+    }
+
+    outf.open("Tasks.txt", std::ios::trunc);
+
+    outf << session << "\n";
+    
+    for(size_t i = 0; i < tasks.size(); i++){
+        outf << tasks[i] << "\n";
+    }
 
     return 0;
 }
@@ -79,7 +143,7 @@ int print(){
     //the following will be the task name, followed by when it was last done
     for(size_t i = 0; i < tasks.size(); i++){
         std::time_t taskTime;
-        std::cout << "[" << i << "] " << tasks[i] << " ";
+        std::cout << "[" << i/2 << "] " << tasks[i] << " ";
         taskTime = atoll(tasks[++i].c_str());
         std::cout << std::asctime(std::localtime(&taskTime)) << "\n";
     }
@@ -112,6 +176,13 @@ int print(){
 
 int main(int argc, char *argv[])
 {
+
+    //there's probably a more elegant solution than the following
+    std::string com1 {};
+    if(argc >= 2){
+        com1 = argv[1];
+    }
+
     std::ifstream inf{ "Tasks.txt" };
     
     // if the user has no task file
@@ -137,20 +208,31 @@ int main(int argc, char *argv[])
             return 1;
         }
         return 0;
-    } else if (argc == 3){
-        //there's probably a more elegant solution than the following
-        std::string com1 {argv[1]};
+    } else if (argc == 2){
 
         if(com1 == "help"){
             help();
             return 0;
-        } else if(com1 == "add"){
+        } else if(com1 == "remove"){
+            int x = rem();
+            if(x == 1){
+                return 1;
+            }
+            return 0;
+        } else {
+            std::cout << "Unknown command, type help for more info \n";
+        }
+
+    } else if (argc == 3){ 
+
+        if(com1 == "add"){
             int x = add(argv[2]);
             if(x == 1){
                 return 1;
             }
             return 0;
         }
+
     } else {
         std::cout << "ERROR: Unknown amount of arguments\n";
         help();
@@ -160,7 +242,6 @@ int main(int argc, char *argv[])
 /*
 TODO: 
 format tasks that haven't been handled for too long
-adding tasks
 removing tasks
 refactor some of these kinda functions 
 int x = somefunc()
