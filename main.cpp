@@ -1,9 +1,10 @@
 #include <fstream>
 #include <iostream>
 #include <string>
+#include <sstream>
 #include <vector>
-
 #include <ctime>
+#include <chrono>
 
 int init(){
     std::ofstream outf{ "Tasks.txt" };
@@ -24,7 +25,7 @@ int init(){
 }
 
 void help(){
-    std::cout << " help: prints out the following\n add <enter string here>: adds a task\n remove: removes a task\n";
+    std::cout << " help: prints out the following\n add <enter string here>: adds a task\n remove: removes a task\n up: updates a task";
 }
 
 int add(std::string title){
@@ -112,6 +113,74 @@ int rem(){
     return 0;
 }
 
+int update(){
+    std::ifstream inf{};
+    
+    if (!inf)
+    {
+        std::cerr << "Unable to read file!\n";
+        return 1;
+    }
+
+    inf.open("Tasks.txt");
+
+    //the first string will always be the session time
+    std::string session{};
+    std::getline(inf, session);
+    
+    //convert entire file into vector
+    std::vector<std::string> tasks;
+    std::string str{};
+    while(std::getline(inf, str)){
+        tasks.push_back(str);
+    }
+    
+    //the following will be the task name, followed by when it was last done
+    for(size_t i = 0; i < tasks.size(); i++){
+        std::time_t taskTime;
+        std::cout << "[" << i/2 << "] " << tasks[i] << " ";
+        taskTime = atoll(tasks[++i].c_str());
+        std::cout << std::asctime(std::localtime(&taskTime)) << "\n";
+    }
+
+    std::cout << "enter index of task you wish to update: \n";
+    int v{};
+    std::cin >> v;
+
+    if (static_cast<long long unsigned int>(v*2) > tasks.size()){
+        std::cout << "invalid index\n";
+    } else {
+        std::cout << "updated " << tasks[v*2];
+        std::time_t timer;
+        std::time(&timer);
+        std::stringstream ss;
+        ss << timer;
+        tasks[v*2 + 1] = ss.str();
+    }
+
+    //close the file
+    
+
+    //now rewrite the file
+    std::ofstream outf{};
+
+    if (!outf)
+    {
+        std::cerr << "Unable to write file!\n";
+        return 1;
+    }
+
+    outf.open("Tasks.txt", std::ios::trunc);
+
+    outf << session << "\n";
+    
+    for(size_t i = 0; i < tasks.size(); i++){
+        outf << tasks[i] << "\n";
+    }
+
+    return 0;
+}
+
 int print(){
 
     std::ifstream inf{};
@@ -135,6 +204,10 @@ int print(){
         tasks.push_back(str);
     }
 
+    //current time
+    std::time_t timer{};
+    std::time(&timer);
+
     std::time_t prevTime;
     prevTime = atoll(session.c_str());
     
@@ -145,7 +218,13 @@ int print(){
         std::time_t taskTime;
         std::cout << "[" << i/2 << "] " << tasks[i] << " ";
         taskTime = atoll(tasks[++i].c_str());
-        std::cout << std::asctime(std::localtime(&taskTime)) << "\n";
+        double timeSince{difftime(timer, taskTime)/86400};
+        if(timeSince > 3){
+            std::cout << "\x1b[91m";
+        } else {
+            std::cout << "\x1b[92m";
+        }
+        std::cout << std::asctime(std::localtime(&taskTime)) << "\x1b[0;m \n";
     }
 
     //close the file
@@ -160,10 +239,7 @@ int print(){
         return 1;
     }
 
-    outf.open("Tasks.txt", std::ios::trunc);
-
-    std::time_t timer{};
-    std::time(&timer);
+    outf.open("Tasks.txt", std::ios::trunc); 
 
     outf << timer << "\n";
     
@@ -219,7 +295,14 @@ int main(int argc, char *argv[])
                 return 1;
             }
             return 0;
-        } else {
+        } else if(com1 == "up"){
+            int x = update();
+            if(x == 1){
+                return 1;
+            }
+        } 
+        
+        else {
             std::cout << "Unknown command, type help for more info \n";
         }
 
@@ -242,7 +325,6 @@ int main(int argc, char *argv[])
 /*
 TODO: 
 format tasks that haven't been handled for too long
-removing tasks
 refactor some of these kinda functions 
 int x = somefunc()
 if (x == 0)
@@ -264,6 +346,9 @@ remove
 
 help
 -- puts a useful help information
+
+up
+-- updates tasks
 
 
 MACROS
