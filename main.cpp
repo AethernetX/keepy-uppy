@@ -87,12 +87,10 @@ int rem(){
         std::cout << "invalid index\n";
     } else {
         std::cout << "removing " << tasks[v*2];
-        tasks.erase(tasks.begin() + ((v*2) - 1), tasks.begin() + ((v*2)) + 1);
+        //idk why it won't let me do it in one line so this will have to do
+        tasks.erase(tasks.begin() + (v*2));
+        tasks.erase(tasks.begin() + ((v*2) + 1));
     }
-
-    //close the file
-    
-
     //now rewrite the file
     std::ofstream outf{};
 
@@ -324,7 +322,6 @@ int main(int argc, char *argv[])
 
 /*
 TODO: 
-format tasks that haven't been handled for too long
 refactor some of these kinda functions 
 int x = somefunc()
 if (x == 0)
