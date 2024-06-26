@@ -6,6 +6,27 @@
 #include <ctime>
 #include <chrono>
 
+//to log how often I use the command
+int logger(){
+    std::time_t timer{};
+    std::time(&timer);
+
+    std::ofstream outf{};
+
+    // If we couldn't open the output file stream for writing
+    if (!outf)
+    {
+        std::cerr << "Unable to write file!\n";
+        return 1;
+    }
+
+    outf.open("log/log.txt", std::ios::app);
+    outf << "ku" << "\n";
+    outf << timer << "\n";
+    outf.close();
+    return 0;
+}
+
 int init(){
     std::ofstream outf{ "Tasks.txt" };
 
@@ -276,6 +297,12 @@ int main(int argc, char *argv[])
             return 0;
         }
 
+        #ifdef LOG
+            if(logger() == 1){
+                return 1;
+            }
+        #endif
+
         if(print() == 1){
             return 1;
         }
@@ -319,17 +346,17 @@ int main(int argc, char *argv[])
     functions:
     default
     -- shows current tasks and when they were last done
-    
+
     add
     -- adds a new task to keep up
-    
+
     remove
     -- removes an existing task
     -- prints an error if there is none or not found
-    
+
     help
     -- puts a useful help information
-    
+
     up
     -- updates tasks
 */
