@@ -261,8 +261,7 @@ int main(int argc, char *argv[])
     
     // if the user has no task file
     if(!inf){
-        int r = init();
-        if(r != 0){
+        if(init() != 0){
             return 1;
         }
         std::cout << "You have no tasks yet!\ntype help for more information";
@@ -277,8 +276,7 @@ int main(int argc, char *argv[])
             return 0;
         }
 
-        int x = print();
-        if(x == 1){
+        if(print() == 1){
             return 1;
         }
         return 0;
@@ -288,18 +286,15 @@ int main(int argc, char *argv[])
             help();
             return 0;
         } else if(com1 == "remove"){
-            int x = rem();
-            if(x == 1){
+            if(rem() == 1){
                 return 1;
             }
             return 0;
         } else if(com1 == "up"){
-            int x = update();
-            if(x == 1){
+            if(update() == 1){
                 return 1;
             }
         } 
-        
         else {
             std::cout << "Unknown command, type help for more info \n";
         }
@@ -307,8 +302,7 @@ int main(int argc, char *argv[])
     } else if (argc == 3){ 
 
         if(com1 == "add"){
-            int x = add(argv[2]);
-            if(x == 1){
+            if(add(argv[2]) == 1){
                 return 1;
             }
             return 0;
@@ -320,38 +314,22 @@ int main(int argc, char *argv[])
     }
 }
 
-/*
-TODO: 
-refactor some of these kinda functions 
-int x = somefunc()
-if (x == 0)
-    return 0;
-
-*/
 
 /*
-functions:
-default
--- shows current tasks and when they were last done
-
-add
--- adds a new task to keep up
-
-remove
--- removes an existing task
--- prints an error if there is none or not found
-
-help
--- puts a useful help information
-
-up
--- updates tasks
-
-
-MACROS
-will produce console outputs and in future work in 
-their respective command lines
-
-ERROR (red)
-
+    functions:
+    default
+    -- shows current tasks and when they were last done
+    
+    add
+    -- adds a new task to keep up
+    
+    remove
+    -- removes an existing task
+    -- prints an error if there is none or not found
+    
+    help
+    -- puts a useful help information
+    
+    up
+    -- updates tasks
 */
