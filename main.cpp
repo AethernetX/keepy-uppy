@@ -6,6 +6,8 @@
 #include <ctime>
 #include <chrono>
 
+#include <Windows.h>
+
 //to log how often I use the command
 int logger(){
     std::time_t timer{};
@@ -27,8 +29,19 @@ int logger(){
     return 0;
 }
 
+//method https://stackoverflow.com/questions/143174/how-do-i-get-the-directory-that-a-program-is-running-from
+std::string getexepath()
+{
+    char result[ MAX_PATH ];
+    std::string path = std::string( result, GetModuleFileName( NULL, result, MAX_PATH ) );
+    size_t pos = path.find_last_of('\\');
+    path.erase(pos + 1, path.size());
+    return path;
+}
+
+
 int init(){
-    std::ofstream outf{ "Tasks.txt" };
+    std::ofstream outf{ getexepath() + "Tasks.txt" };
 
     // If we couldn't open the output file stream for writing
     if (!outf)
@@ -62,7 +75,7 @@ int add(std::string title){
         return 1;
     }
 
-    outf.open("Tasks.txt", std::ios::app);
+    outf.open(getexepath() + "Tasks.txt", std::ios::app);
     outf << title << "\n";
     outf << timer << "\n";
     outf.close();
@@ -79,7 +92,7 @@ int rem(){
         return 1;
     }
 
-    inf.open("Tasks.txt");
+    inf.open(getexepath() + "Tasks.txt");
 
     //the first string will always be the session time
     std::string session{};
@@ -121,7 +134,7 @@ int rem(){
         return 1;
     }
 
-    outf.open("Tasks.txt", std::ios::trunc);
+    outf.open(getexepath() + "Tasks.txt", std::ios::trunc);
 
     outf << session << "\n";
     
@@ -141,7 +154,7 @@ int update(){
         return 1;
     }
 
-    inf.open("Tasks.txt");
+    inf.open(getexepath() + "Tasks.txt");
 
     //the first string will always be the session time
     std::string session{};
@@ -189,7 +202,7 @@ int update(){
         return 1;
     }
 
-    outf.open("Tasks.txt", std::ios::trunc);
+    outf.open(getexepath() + "Tasks.txt", std::ios::trunc);
 
     outf << session << "\n";
     
@@ -210,7 +223,7 @@ int print(){
         return 1;
     }
 
-    inf.open("Tasks.txt");
+    inf.open(getexepath() + "Tasks.txt");
 
     //the first string will always be the session time
     std::string session{};
@@ -258,7 +271,7 @@ int print(){
         return 1;
     }
 
-    outf.open("Tasks.txt", std::ios::trunc); 
+    outf.open(getexepath() + "Tasks.txt", std::ios::trunc); 
 
     outf << timer << "\n";
     
@@ -278,7 +291,7 @@ int main(int argc, char *argv[])
         com1 = argv[1];
     }
 
-    std::ifstream inf{ "Tasks.txt" };
+    std::ifstream inf{ getexepath() + "Tasks.txt" };
     
     // if the user has no task file
     if(!inf){
