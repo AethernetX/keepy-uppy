@@ -1,0 +1,6 @@
+- refactor the code
+- support for linux
+- successfully compile in MSVC
+- reformat the way the data is stored similar to a .csv file
+- have a way to have a variance in how frequently you need to deal with tasks (e.g some tasks should be done every 2 days others every month)
+- better args handling?
