@@ -6,6 +6,11 @@
 #include <fstream>
 #include <iostream>
 
+namespace tam
+{
+   using days = std::chrono::duration<int, std::ratio<86400>>;
+} // namespace tam
+
 class Task
 {
     public:
@@ -16,7 +21,7 @@ class Task
         std::string taskName;
         std::chrono::time_point<std::chrono::system_clock> date;
         int priority;
-        std::chrono::hours interval;
+        int interval;
     
     private:
         
