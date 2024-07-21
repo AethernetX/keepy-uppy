@@ -5,7 +5,9 @@ using namespace std::chrono_literals;
 int main(){
     TaskManager taskmanager = TaskManager("Example.txt");
 
-    const auto now = std::chrono::system_clock::now();
+    taskmanager.remove();
+
+    //const auto now = std::chrono::system_clock::now();
 
 //    std::string str {"477960"};
 
@@ -15,9 +17,3 @@ int main(){
     
 //    std::cout << std::chrono::duration_cast<tam::days>(now.time_since_epoch() - hour).count();
 }
-
-/*
-incase I forgor:
-    - correct output for tostring ~
-    - parser for commands x
-*/

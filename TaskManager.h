@@ -33,14 +33,19 @@ class TaskManager {
         TaskManager(std::string filepath);
         ~TaskManager();
 
-        std::vector<Task>* getTask();
+        std::vector<Task> getTask();
+
+        void add(std::string name, int interval = 5);
+        void remove();
+        void print();
+
     private:
         std::vector<Task> tasks{};
 
         std::string filepath;
 
-        std::chrono::time_point<std::chrono::system_clock> lastSession;
-
         std::ifstream input;
         std::ofstream output;
+
+        std::chrono::time_point<std::chrono::system_clock> stringToTimepoint(std::string string);
 };
